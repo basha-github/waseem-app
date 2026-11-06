@@ -48,7 +48,7 @@ const CAM_W = 640, CAM_H = 480;
 
 const CAL_DWELL_MS = 2000;
 const CAL_STILL_CAM = 40;
-const CAL_RELEASE_CAM = 65;
+const CAL_RELEASE_CAM = 20;
 
 const CAL_STORAGE_KEY = calStorageKey(); // separate calibration for IR pen vs. hand
 

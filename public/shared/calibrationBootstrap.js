@@ -36,7 +36,7 @@ const DOT_R = 22;
 
 const CAL_DWELL_MS = 2000;
 const CAL_STILL_CAM = 40;     // px the pen may wobble (camera px) and still count as "holding still"
-const CAL_RELEASE_CAM = 65;   // px the pen must travel from the last capture... unless it was lifted
+const CAL_RELEASE_CAM = 20;   // px the pen must travel from the last capture... unless it was lifted
 const CAL_DROP_MS = 600;      // a dropout shorter than this does NOT restart the 2 s hold
 const CAL_LIFT_MS = 250;      // ...lifting the pen off the wall this long also releases it
 
@@ -289,7 +289,7 @@ class Calibrator {
 
   finishCal() {
     this.calDone = true;
-    if (this.pairs.length < 4) { this.calH = null; return; }
+    if (this.pairs.length < 4) { this.calH = null; setTimeout(() => this.buildGrid(), 1200); return; }
     this.calH = computeHomography(
       this.pairs.map(p => ({ cam: p.cam, proj: [p.proj[0] / this.width, p.proj[1] / this.height] }))
     );
