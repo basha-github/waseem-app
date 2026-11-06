@@ -1,0 +1,154 @@
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; height: 100%; width: 100%;
+  background: #0b0b14; color: #f4f2ff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  overflow: hidden;
+}
+.hidden { display: none !important; }
+.view { position: fixed; inset: 0; }
+
+/* ── WALL ─────────────────────────────────────────── */
+.app-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #000; }
+
+.home-btn {
+  position: fixed; top: 16px; left: 16px; z-index: 20;
+  width: 52px; height: 52px; border-radius: 50%;
+  border: none; background: rgba(20,18,34,0.75); color: #fff;
+  font-size: 22px; cursor: pointer; backdrop-filter: blur(6px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.home-btn:hover { background: rgba(124,60,220,0.9); }
+
+.menu-overlay {
+  position: fixed; inset: 0; z-index: 15;
+  background: radial-gradient(circle at 30% 20%, #1c1730, #08070d 70%);
+  display: flex; align-items: flex-start; justify-content: center;
+  overflow-y: auto;
+  padding: 5vh 0 40px;
+}
+.menu-panel { width: min(1100px, 92vw); text-align: center; }
+.menu-panel h1 { font-size: clamp(28px, 4vw, 44px); margin-bottom: 20px; letter-spacing: 0.5px; }
+
+/* ── category filter chips ───────────────────────────── */
+.category-chips {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+  margin-bottom: 22px;
+}
+.chip {
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: #c9c3e6;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .12s ease, color .12s ease, border-color .12s ease;
+  white-space: nowrap;
+}
+.chip:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.chip.active {
+  background: linear-gradient(135deg, #7c3cdc, #9d5cff);
+  border-color: transparent;
+  color: #fff;
+}
+
+.tile-grid-host { width: 100%; }
+.category-header {
+  text-align: left;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #c9c3e6;
+  margin: 28px 2px 12px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.tile-grid-nested:first-of-type,
+h2.category-header:first-child + .tile-grid-nested { margin-top: 0; }
+.category-header:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+/* ── REMOTE ───────────────────────────────────────── */
+.remote-panel {
+  height: 100%; width: 100%; padding: 24px 18px 40px;
+  display: flex; flex-direction: column; align-items: center;
+  overflow-y: auto;
+  background: radial-gradient(circle at 30% 0%, #1c1730, #08070d 70%);
+}
+.remote-panel h1 { font-size: 26px; margin: 8px 0 4px; }
+.remote-sub { color: #b8b0d8; margin: 0 0 20px; font-size: 14px; }
+
+.mode-row { display: flex; gap: 8px; margin-bottom: 20px; }
+.mode-chip {
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: #c9c3e6;
+  padding: 9px 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .12s ease, color .12s ease, border-color .12s ease;
+}
+.mode-chip:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.mode-chip.active {
+  background: linear-gradient(135deg, #7c3cdc, #9d5cff);
+  border-color: transparent;
+  color: #fff;
+}
+
+/* ── shared tile grid ─────────────────────────────── */
+.tile-grid {
+  display: grid; gap: 16px; width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.tile {
+  --tile-color: #7c3cdc;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 22px 14px; border-radius: 18px; cursor: pointer;
+  color: #fff; text-align: center;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(155deg, color-mix(in srgb, var(--tile-color) 35%, #16121f), #14121d);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.tile:hover, .tile:active {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.5), 0 0 0 2px var(--tile-color) inset;
+}
+.tile-icon { font-size: 40px; line-height: 1; }
+.tile-title { font-weight: 700; font-size: 16px; }
+.tile-sub { font-size: 12px; color: #c9c3e6; }
+
+.hint { color: #8a83ad; font-size: 12px; margin-top: 22px; }
+#remoteStatus { min-height: 16px; }
+
+/* ── AUTH ─────────────────────────────────────────── */
+.auth-panel {
+  width: min(360px, 90vw); margin: auto; padding-top: 14vh;
+  text-align: center;
+}
+.auth-panel h1 { font-size: 26px; margin-bottom: 4px; }
+.auth-sub { color: #b8b0d8; font-size: 13px; margin: 0 0 24px; }
+#authForm { display: flex; flex-direction: column; gap: 12px; }
+#authForm input {
+  padding: 13px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.12);
+  background: #161320; color: #fff; font-size: 15px; outline: none;
+}
+#authForm input:focus { border-color: #7c3cdc; }
+#authForm button[type="submit"] {
+  padding: 13px 14px; border-radius: 12px; border: none; cursor: pointer;
+  background: linear-gradient(135deg, #7c3cdc, #9d5cff); color: #fff;
+  font-size: 15px; font-weight: 700; margin-top: 4px;
+}
+#authForm button[type="submit"]:disabled { opacity: 0.6; cursor: default; }
+.auth-toggle { margin-top: 18px; font-size: 13px; color: #b8b0d8; }
+.link-btn {
+  background: none; border: none; color: #b18cff; cursor: pointer;
+  font-size: inherit; text-decoration: underline; padding: 0;
+}
+.auth-error { color: #ff7a7a; font-size: 13px; min-height: 16px; margin-top: 14px; }
+
+.account-line { margin-top: 10px; font-size: 12px; color: #8a83ad; }
+.account-line strong { color: #ddd7ff; }

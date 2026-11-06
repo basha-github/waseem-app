@@ -1,0 +1,137 @@
+/* ═══════════════════════════════════════════════════════════════
+   Wall-mode additions: camera/calibration boot overlay, fingertip
+   cursor, and a generic "being dwelled on" highlight for whatever
+   button/tile the tracked finger is currently hovering.
+   Layered above the original Cosmic Color Quiz UI (#ui-overlay is
+   z-index 5), below nothing — this is the top of the stack until
+   the boot overlay is dismissed.
+   ═══════════════════════════════════════════════════════════════ */
+
+.cal-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: none;
+}
+
+.wall-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(11, 16, 38, 0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Only the card itself should catch clicks — if camera/model init ever
+     fails and this overlay is stuck visible, the dimmed background must
+     NOT swallow clicks meant for the app underneath (e.g. Back/Next/Say
+     it again buttons), or the whole page becomes unusable. */
+  pointer-events: none;
+}
+
+.wall-overlay-card {
+  pointer-events: auto; /* re-enable clicks for the card itself */
+  background: #14193a;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 32px 36px;
+  max-width: 480px;
+  width: calc(100% - 48px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  color: #F5F2FF;
+  font-family: 'Quicksand', system-ui, sans-serif;
+}
+
+.wall-overlay-card h1 {
+  margin: 0 0 6px;
+  font-family: 'Baloo 2', system-ui, sans-serif;
+  font-size: 24px;
+}
+.wall-overlay-card h1 span {
+  display: block;
+  font-size: 13px;
+  font-weight: normal;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #FFD23F;
+  margin-top: 4px;
+}
+.wall-overlay-card p {
+  color: #c9c4e8;
+  line-height: 1.5;
+  font-size: 14px;
+}
+.wall-steps {
+  margin: 16px 0 24px;
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.wall-steps kbd {
+  background: rgba(255,255,255,0.12);
+  border-radius: 4px;
+  padding: 1px 6px;
+  border: 1px solid rgba(255,255,255,0.2);
+  font-family: monospace;
+}
+#wallStartBtn {
+  width: 100%;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #6C3FAE, #FF6B5B);
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+#wallStartBtn:hover { transform: translateY(-1px); }
+#wallStartBtn:disabled { opacity: 0.7; cursor: default; }
+.wall-status {
+  margin-top: 14px;
+  min-height: 18px;
+  font-size: 13px;
+  color: #2EC4B6;
+  text-align: center;
+}
+
+/* ── fingertip cursor ─────────────────────────────────────────── */
+.wall-cursor {
+  position: fixed;
+  z-index: 60;
+  width: 60px;
+  height: 60px;
+  margin-left: -30px;
+  margin-top: -30px;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.5));
+}
+
+/* ── generic "being selected by dwell" highlight ─────────────────
+   Applied by js/main.js to whatever clickable element the fingertip
+   is currently hovering, so touch feels responsive even without a
+   visible cursor sitting exactly on top of small targets. */
+.wall-dwell-hover {
+  outline: 4px solid #ff69b4 !important;
+  outline-offset: 2px;
+  filter: brightness(1.12);
+}
+
+/* ── "continue without a camera" fallback ─────────────────────────
+   Lets the overlay be dismissed without hand-tracking, so plain mouse/
+   touch clicks on the app's own buttons work right away. Injected into
+   the overlay card by shared/calibrationBootstrap.js at runtime. */
+.wall-skip-link {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  color: #9d97c9;
+  font-family: 'Quicksand', system-ui, sans-serif;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.wall-skip-link:hover { color: #c9c4e8; }

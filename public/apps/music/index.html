@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Music</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <canvas id="stage"></canvas>
+
+    <div id="overlay" class="overlay">
+      <div class="overlay-card">
+        <h1>My Music<span>Finger &amp; Touch Instrument Poster</span></h1>
+        <p>
+          Point at — or hover the mouse over, or touch — an instrument on
+          the poster to play it. Uses your webcam and on-device hand
+          tracking; nothing is uploaded anywhere.
+        </p>
+        <ul class="steps">
+          <li>Allow camera access when prompted.</li>
+          <li>Hold your fingertip still over each of the 9 dots for 2 seconds to calibrate.</li>
+          <li>Point at an instrument to play it — no click needed.</li>
+          <li>Press <kbd>R</kbd> any time to recalibrate.</li>
+        </ul>
+        <button id="startBtn">Start camera &amp; begin</button>
+        <p id="status" class="status"></p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+  <script type="module" src="../../shared/bgMusic.js"></script>
+</body>
+</html>

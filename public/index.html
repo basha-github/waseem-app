@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Interactive Wall</title>
+<link rel="stylesheet" href="launcher.css" />
+</head>
+<body>
+
+  <!-- ───────────────── AUTH (login / create account) ───────────────── -->
+  <div id="authView" class="view hidden">
+    <div class="auth-panel">
+      <h1>Interactive Wall</h1>
+      <p class="auth-sub">Log in so this device can sync with the wall.</p>
+      <form id="authForm">
+        <input id="authUsername" type="text" placeholder="Username" autocomplete="username" required />
+        <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password" required />
+        <button type="submit" id="authSubmit">Log in</button>
+      </form>
+      <p class="auth-toggle">
+        <span id="authToggleText">New here?</span>
+        <button type="button" id="authToggleBtn" class="link-btn">Create an account</button>
+      </p>
+      <p id="authError" class="auth-error"></p>
+    </div>
+  </div>
+
+  <!-- ───────────────── WALL VIEW (desktop / touch-wall PC) ───────────────── -->
+  <div id="wallView" class="view hidden">
+    <iframe id="appFrame" class="app-frame" allow="camera; autoplay" title="active app"></iframe>
+
+    <button id="homeBtn" class="home-btn" title="Menu / switch app">⌂</button>
+
+    <div id="menuOverlay" class="menu-overlay hidden">
+      <div class="menu-panel">
+        <h1>Choose an app</h1>
+        <div id="tileGridHost" class="tile-grid-host"></div>
+        <p class="hint">Tip: log in with the same account on your phone to switch apps remotely.</p>
+        <p class="account-line">Signed in as <strong id="wallUsername"></strong> — <button type="button" id="wallLogoutBtn" class="link-btn">log out</button></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────────── REMOTE VIEW (phone) ───────────────── -->
+  <div id="remoteView" class="view hidden">
+
+    <!-- app playing locally on the phone -->
+    <iframe id="remoteAppFrame" class="app-frame hidden" allow="camera; autoplay" title="active app on phone"></iframe>
+    <button id="remoteHomeBtn" class="home-btn hidden" title="Back to remote menu">⌂</button>
+
+    <div id="remoteMenu" class="remote-panel">
+      <h1>Wall Remote</h1>
+      <p class="remote-sub">Now playing on the wall: <strong id="nowPlaying">—</strong></p>
+      <div id="remoteModeRow" class="mode-row">
+        <button type="button" id="modePlayHere" class="mode-chip active">Play on this phone</button>
+        <button type="button" id="modeSendWall" class="mode-chip">Send to wall only</button>
+      </div>
+      <div id="remoteGridHost" class="tile-grid-host"></div>
+      <p id="remoteStatus" class="hint"></p>
+      <p class="account-line">Signed in as <strong id="remoteUsername"></strong> — <button type="button" id="remoteLogoutBtn" class="link-btn">log out</button></p>
+    </div>
+  </div>
+
+  <script src="apps.js"></script>
+  <script src="launcher.js"></script>
+</body>
+</html>

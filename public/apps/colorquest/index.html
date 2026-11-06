@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Color Quest! 🎨 — Point at the Color</title>
+<link rel="stylesheet" href="style.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="page">
+    <div id="canvasHolder"></div>
+    <canvas id="calStage"></canvas>
+
+    <div id="overlay" class="overlay">
+      <div class="overlay-card">
+        <h1>Color Quest!<span>Point at the Color</span></h1>
+        <p>
+          Point your index finger at the shape whose color matches the
+          question, and hold it there for a moment to pick it. Uses your
+          webcam and on-device hand tracking — nothing is uploaded anywhere.
+        </p>
+        <ul class="steps">
+          <li>Allow camera access when prompted.</li>
+          <li>Hold your fingertip still over each of the 9 dots for 2 seconds to calibrate (skipped automatically if you've already calibrated another app on this wall).</li>
+          <li>Point at, and hold over, the shape with the color being asked for.</li>
+          <li>Press <kbd>R</kbd> any time to recalibrate.</li>
+        </ul>
+        <button id="startBtn">Start camera &amp; begin</button>
+        <p id="status" class="status"></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="ColorQuest.js"></script>
+  <script type="module" src="js/main.js"></script>
+  <script type="module" src="../../shared/bgMusic.js"></script>
+</body>
+</html>

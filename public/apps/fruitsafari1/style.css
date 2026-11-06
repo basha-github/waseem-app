@@ -1,0 +1,185 @@
+:root{
+  --sky-top:     #FFE9B8;
+  --sky-bottom:  #FFD27A;
+  --crate-brown: #8B5A2B;
+  --crate-light: #C68642;
+  --crate-dark:  #5C3A1A;
+  --leaf-green:  #5B8C3A;
+  --tomato-red:  #E63946;
+  --citrus:      #FF9F1C;
+  --grape:       #7B4397;
+  --cream:       #FFFBF0;
+  --ink:         #3B2412;
+
+  --font-display: 'Fredoka', system-ui, sans-serif;
+  --font-body: 'Nunito', system-ui, sans-serif;
+}
+
+*{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body{
+  margin:0; padding:0;
+  width:100%; height:100%;
+  overflow:hidden;
+  background: var(--sky-bottom);
+  font-family: var(--font-body);
+  touch-action: manipulation;
+}
+
+canvas{ display:block; position:fixed; top:0; left:0; z-index:0; }
+
+#ui-overlay{
+  position:fixed; inset:0;
+  z-index:5;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  pointer-events:none;
+  padding: env(safe-area-inset-top, 0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
+}
+
+/* ---------- top bar ---------- */
+.header-area{
+  display:flex;
+  flex-direction:column;
+  gap: 10px;
+}
+
+.top-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 14px 22px 0 22px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background: rgba(139,90,43,0.55);
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 999px;
+  padding: 8px 18px 8px 14px;
+  backdrop-filter: blur(3px);
+}
+.brand-fruit{ font-size: 22px; filter: drop-shadow(0 2px 0 rgba(0,0,0,0.2)); }
+.brand-text{
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--cream);
+  font-size: clamp(15px, 2.4vw, 22px);
+  letter-spacing: 0.3px;
+}
+
+.counter{
+  font-family: var(--font-display);
+  font-weight:600;
+  color: var(--ink);
+  background: var(--citrus);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: clamp(13px, 2vw, 17px);
+  box-shadow: 0 3px 0 rgba(0,0,0,0.18);
+}
+
+/* ---------- word banner ---------- */
+.word-banner{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:center;
+  gap: 10px;
+  padding: 0 16px;
+  pointer-events:none;
+}
+
+.word-part{
+  display:flex;
+  gap: 6px;
+}
+
+.letter-tile{
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--crate-dark);
+  background: var(--cream);
+  border: 3px solid var(--crate-brown);
+  border-radius: 12px;
+  width: clamp(28px, 6vw, 46px);
+  height: clamp(32px, 6.8vw, 52px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size: clamp(16px, 3.4vw, 28px);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.18);
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.letter-tile.active{
+  background: var(--tomato-red);
+  color: var(--cream);
+  transform: translateY(-6px) scale(1.12);
+  box-shadow: 0 8px 0 rgba(0,0,0,0.2);
+  border-color: var(--cream);
+}
+
+.letter-tile.active-word{
+  background: var(--leaf-green);
+  color: var(--cream);
+  transform: scale(1.08);
+}
+
+/* ---------- bottom controls ---------- */
+.controls{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap: clamp(10px, 3vw, 26px);
+  padding: 0 16px clamp(14px, 3vh, 28px) 16px;
+  pointer-events:none;
+}
+
+.crate-btn, .speak-btn{
+  pointer-events:auto;
+  cursor:pointer;
+  border: none;
+  outline-offset: 3px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-size: clamp(13px, 2.4vw, 18px);
+  box-shadow: 0 5px 0 rgba(0,0,0,0.22);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  user-select:none;
+}
+.crate-btn{
+  background: var(--crate-light);
+  color: var(--cream);
+  border: 2px solid var(--crate-dark);
+}
+.speak-btn{
+  background: var(--tomato-red);
+  color: var(--cream);
+  border: 2px solid #a5202b;
+  padding: 14px 22px;
+}
+.crate-icon, .speak-icon{ font-size: 1.2em; }
+
+.crate-btn:active, .speak-btn:active{
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.22);
+}
+
+.crate-btn:focus-visible, .speak-btn:focus-visible{
+  outline: 3px solid var(--citrus);
+}
+
+@media (max-width: 520px){
+  .crate-label{ display:none; }
+  .speak-label{ display:none; }
+  .brand-text{ display:none; }
+}

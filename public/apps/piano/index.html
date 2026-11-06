@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wisdom Play School Piano</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <canvas id="stage"></canvas>
+
+    <div id="overlay" class="overlay">
+      <div class="overlay-card">
+        <h1>MyPiano<span>Finger &amp; Touch Piano</span></h1>
+        <p>
+          Point at, click, or tap piano keys to play them — chords and
+          two-handed playing both work. Uses your webcam and on-device hand
+          tracking; nothing is uploaded anywhere.
+        </p>
+        <ul class="steps">
+          <li>Allow camera access when prompted.</li>
+          <li>Hold your fingertip still over each of the 9 dots for 2 seconds to calibrate.</li>
+          <li>Point at (or click/tap) a key to play it.</li>
+          <li>Press <kbd>R</kbd> any time to recalibrate.</li>
+        </ul>
+        <button id="startBtn">Start camera &amp; begin</button>
+        <p id="status" class="status"></p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+  <script type="module" src="../../shared/bgMusic.js"></script>
+</body>
+</html>

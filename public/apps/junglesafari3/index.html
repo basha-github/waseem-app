@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Jungle Word Safari — Set 3 of 6</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="wall.css" />
+</head>
+<body>
+
+<div id="ui-overlay">
+
+  <div class="header-area">
+    <header class="top-bar">
+      <div class="brand">
+        <span class="brand-leaf">🌿</span>
+        <span class="brand-text">Jungle Word Safari · Set 3</span>
+      </div>
+      <div class="counter" id="counter">1 / 10</div>
+    </header>
+
+    <div class="word-banner" id="wordBanner"></div>
+  </div>
+
+  <footer class="controls">
+    <button id="prevBtn" class="paw-btn" aria-label="Previous picture">
+      <span class="paw-icon">🐾</span><span class="paw-label">Back</span>
+    </button>
+
+    <button id="replayBtn" class="speak-btn" aria-label="Hear the word again">
+      <span class="speak-icon">🔊</span><span class="speak-label">Say it again</span>
+    </button>
+
+    <button id="nextBtn" class="paw-btn paw-btn-next" aria-label="Next picture">
+      <span class="paw-label">Next</span><span class="paw-icon">🐾</span>
+    </button>
+  </footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<script src="data.js"></script>
+<script src="JungleSafari_3.js"></script>
+
+<!-- ══════════ wall fingertip cursor ══════════ -->
+<div id="wallCursor" class="wall-cursor" hidden>
+  <svg viewBox="0 0 60 60" width="60" height="60">
+    <circle id="wallCursorRing" cx="30" cy="30" r="24" fill="none" stroke="#ff69b4" stroke-width="4"
+            stroke-dasharray="151" stroke-dashoffset="151" transform="rotate(-90 30 30)" />
+    <circle cx="30" cy="30" r="6" fill="#ff69b4" />
+  </svg>
+</div>
+
+<!-- ══════════ wall camera / calibration boot overlay ══════════ -->
+<canvas id="calStage" class="cal-stage"></canvas>
+<div id="wallOverlay" class="wall-overlay">
+  <div class="wall-overlay-card">
+    <h1>Jungle Word Safari<span>Touch-Wall Edition</span></h1>
+    <p>
+      Point your index finger at the black &amp; white picture — or at
+      Back / Say it again / Next — and hold it there for a moment to
+      select it. Uses your webcam and on-device hand tracking — nothing
+      is uploaded anywhere.
+    </p>
+    <ul class="wall-steps">
+      <li>Allow camera access when prompted.</li>
+      <li>Hold your fingertip still over each of the 9 dots for 2 seconds to calibrate (skipped automatically if you've already calibrated another app on this wall).</li>
+      <li>Point at, and hold over, the picture or a button to select it.</li>
+      <li>Press <kbd>R</kbd> any time to recalibrate.</li>
+    </ul>
+    <button id="wallStartBtn">Start camera &amp; begin</button>
+    <p id="wallStatus" class="wall-status"></p>
+  </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+  <script type="module" src="../../shared/bgMusic.js"></script>
+</body>
+</html>

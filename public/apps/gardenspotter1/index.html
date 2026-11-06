@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Garden Spotter 1 🥕</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+
+    html, body {
+      width:100%; height:100%; overflow:hidden;
+      font-family:'Fredoka One', cursive;
+      background: linear-gradient(180deg, #0a2e1c 0%, #134f2c 22%, #1f7a42 48%, #4f9a3f 72%, #4a3623 100%);
+    }
+
+    /* soft light shaft through the canopy, like sun breaking through */
+    #light-shaft {
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+      background: radial-gradient(ellipse 60% 50% at 52% 28%, rgba(255,250,210,.22) 0%, rgba(255,250,210,0) 70%);
+    }
+
+    /* layered leaf silhouettes framing the corners, like an illustrated jungle mural */
+    .leaf-frame { position:fixed; z-index:1; pointer-events:none; opacity:.95; }
+
+    /* dappled jungle sunlight */
+    #sun {
+      position:fixed; top:16px; right:48px; width:70px; height:70px;
+      background: radial-gradient(circle at 35% 30%, #fff9c4, #ffd23f 55%, #c98b1f 100%);
+      border-radius:50%; z-index:1;
+      box-shadow:0 0 0 14px rgba(255,217,80,.20), 0 0 0 28px rgba(120,200,80,.16);
+      animation:sunGlow 3s ease-in-out infinite;
+    }
+    @keyframes sunGlow {
+      0%,100%{box-shadow:0 0 0 14px rgba(255,217,80,.20),0 0 0 28px rgba(120,200,80,.16)}
+      50%    {box-shadow:0 0 0 20px rgba(255,217,80,.28),0 0 0 38px rgba(120,200,80,.2)}
+    }
+
+    /* hanging jungle vines */
+    .vine { position:fixed; top:-10px; z-index:1; pointer-events:none; transform-origin:top center; animation:vineSway 4s ease-in-out infinite; }
+    @keyframes vineSway { 0%,100%{transform:rotate(-4deg)} 50%{transform:rotate(4deg)} }
+
+    /* soft grassy clearing where the animals' notes are pinned */
+    #clearing {
+      position:fixed; left:50%; bottom:46px; transform:translateX(-50%);
+      width:92vw; height:62vh; z-index:1; pointer-events:none;
+      background: radial-gradient(ellipse 60% 55% at 50% 70%, rgba(150,210,110,.30) 0%, rgba(150,210,110,0) 72%);
+    }
+
+    /* ground */
+    #grass {
+      position:fixed; bottom:0; left:0; right:0; height:50px; z-index:5;
+      background:linear-gradient(180deg,#4f7a2e,#3a5a1f);
+      border-top:4px solid rgba(255,255,255,.2);
+    }
+    #grass::before {
+      content:'🍃🌿🍄🌿🍃🌿🪴🌿🍃🌿🍄🌿🍃🌿🪴🌿🍃🌿🍄🌿🍃🌿🪴🌿🍃🌿🍄';
+      position:absolute; top:-15px; font-size:1.05rem; letter-spacing:2px;
+      white-space:nowrap; overflow:hidden; width:100%;
+    }
+
+    /* score bar */
+    #scorebar {
+      position:fixed; top:0; left:0; right:0; height:50px; z-index:30;
+      display:flex; align-items:center; justify-content:space-between; padding:0 20px;
+      background:rgba(255,254,247,.90); backdrop-filter:blur(6px);
+      border-bottom:3px solid rgba(47,150,81,.4);
+    }
+    #scorebar .title { font-size:1.2rem; color:#176b3a; }
+    #scorebar .title span { color:#c98b1f; }
+    #score-box { font-size:.9rem; color:#176b3a; display:flex; align-items:center; gap:8px; }
+    #stars-row { font-size:1.1rem; min-width:56px; }
+
+    /* ── Stage ── */
+    #stage {
+      position:fixed; top:50px; left:0; right:0; bottom:50px;
+      display:flex; flex-direction:column; align-items:center;
+      z-index:10; padding:14px 10px 6px;
+    }
+
+    /* question card */
+    #question-card {
+      background:rgba(255,254,247,.95); border-radius:24px;
+      border:4px solid #FFD700;
+      box-shadow:0 8px 28px rgba(0,0,0,.18);
+      padding:12px 30px 10px; text-align:center;
+      animation:cardPop .45s cubic-bezier(.34,1.56,.64,1);
+      margin-bottom:14px;
+    }
+    @keyframes cardPop{from{transform:scale(.5) rotate(-4deg);opacity:0}to{transform:scale(1);opacity:1}}
+    #question-text {
+      font-size:clamp(1.4rem,4.2vw,2.2rem);
+      color:#176b3a;
+    }
+    #question-text .target { color:#e8333a; }
+    #hint-label {
+      font-family:'Nunito',sans-serif; font-weight:700;
+      font-size:.82rem; color:#5a3c22; opacity:.75; margin-top:2px;
+    }
+
+    /* animal field — posters get pinned across this whole area, like a wall */
+    #item-field {
+      position:relative;
+      flex:1; width:100%; max-width:1180px;
+      overflow:auto;
+    }
+
+    .item-card {
+      position:absolute;
+      cursor:pointer;
+      transform: translate(-50%,-50%) rotate(var(--rot,0deg));
+      transition: transform .18s;
+    }
+    .item-card:hover {
+      transform: translate(-50%,-50%) rotate(0deg) scale(1.14) !important;
+      z-index:50;
+    }
+
+    .poster-inner {
+      position:relative; width:100%; height:100%;
+      animation: cardIn .4s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes cardIn {
+      from { transform:scale(.4); opacity:0; }
+      to   { transform:scale(1); opacity:1; }
+    }
+
+    /* tiny piece of tape pinning the poster at an angle */
+    .poster-tape {
+      position:absolute; top:-11px; left:50%;
+      width:54px; height:20px;
+      transform:translateX(-50%) rotate(var(--tape-rot, -4deg));
+      background:linear-gradient(180deg, rgba(255,247,200,.92), rgba(255,221,120,.78));
+      box-shadow:0 2px 5px rgba(0,0,0,.2);
+      border-radius:2px;
+      z-index:2;
+    }
+
+    .item-frame {
+      width:100%; height:100%;
+      background:rgba(255,254,247,.92);
+      border-radius:10px;
+      border:4px solid #fff;
+      box-shadow:0 8px 18px rgba(0,0,0,.35), inset 0 2px 0 rgba(255,255,255,.7);
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden;
+      transition:box-shadow .14s;
+      position:relative; z-index:1;
+    }
+    .item-frame img {
+      width:92%; height:92%;
+      object-fit:contain;
+      pointer-events:none;
+    }
+    .item-card:hover .item-frame {
+      box-shadow:0 14px 28px rgba(0,0,0,.4), 0 0 0 3px #FFD700;
+    }
+
+    .item-card.correct-flash .item-frame { animation:correctFlash .55s ease forwards; }
+    .item-card.wrong-shake   .item-frame { animation:wrongShake   .45s ease forwards; }
+    @keyframes correctFlash {
+      0%  {border-color:#fff;}
+      45% {box-shadow:0 0 0 12px rgba(255,215,0,.5), 0 0 30px 10px rgba(255,215,0,.4);
+           border-color:#FFD700; filter:brightness(1.3);}
+      100%{box-shadow:0 0 0 6px rgba(255,215,0,.25); border-color:#FFD700; filter:brightness(1.12);}
+    }
+    @keyframes wrongShake {
+      0%,100%{transform:translateX(0)}
+      20%{transform:translateX(-9px)}
+      40%{transform:translateX(8px)}
+      60%{transform:translateX(-6px)}
+      80%{transform:translateX(6px)}
+    }
+
+    /* confetti */
+    #confetti-canvas { position:fixed; inset:0; pointer-events:none; z-index:40; }
+
+    /* result overlay */
+    #result-overlay {
+      position:fixed; inset:0; z-index:50;
+      display:flex; align-items:center; justify-content:center;
+      pointer-events:none; opacity:0; transition:opacity .25s;
+    }
+    #result-overlay.show { opacity:1; pointer-events:auto; }
+    #result-badge {
+      background:rgba(255,254,247,.97); border-radius:30px;
+      border:5px solid #ffd700;
+      box-shadow:0 12px 40px rgba(0,0,0,.18);
+      padding:22px 42px 18px; text-align:center;
+      animation:badgePop .45s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes badgePop{from{transform:scale(.3) rotate(-10deg);opacity:0}to{transform:scale(1);opacity:1}}
+    #result-emoji { font-size:3.2rem; display:block; }
+    #result-msg   { font-size:clamp(1.2rem,4vw,2rem); color:#2e9e4f; margin-top:4px; }
+    #result-msg.wrong { color:#e8333a; }
+  </style>
+<link rel="stylesheet" href="wall.css" />
+</head>
+<body>
+  <div id="light-shaft"></div>
+  <div id="sun"></div>
+  <div id="clearing"></div>
+  <div id="grass"></div>
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Layered leaf silhouettes framing the scene, like an illustrated jungle mural -->
+  <svg class="leaf-frame" style="top:-30px; left:-40px;" width="260" height="220" viewBox="0 0 260 220">
+    <path d="M0,0 C90,10 150,60 170,150 C140,120 70,90 0,90 Z" fill="#0c3a20" opacity=".9"/>
+    <path d="M0,0 C70,20 120,70 130,140 C105,110 55,85 0,80 Z" fill="#155a30" opacity=".9"/>
+  </svg>
+  <svg class="leaf-frame" style="top:-30px; right:-40px;" width="260" height="220" viewBox="0 0 260 220">
+    <path d="M260,0 C170,10 110,60 90,150 C120,120 190,90 260,90 Z" fill="#0c3a20" opacity=".9"/>
+    <path d="M260,0 C190,20 140,70 130,140 C155,110 205,85 260,80 Z" fill="#155a30" opacity=".9"/>
+  </svg>
+
+  <!-- Hanging jungle vines -->
+  <div class="vine" style="left:2vw; animation-delay:-1s;">
+    <svg width="34" height="120" viewBox="0 0 34 120">
+      <path d="M17,0 C8,24 26,42 15,68 C7,88 24,100 14,120" stroke="#2f7a3e" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="10" cy="22" rx="10" ry="6" fill="#3fa34d" transform="rotate(-22 10 22)"/>
+      <ellipse cx="24" cy="50" rx="10" ry="6" fill="#3fa34d" transform="rotate(20 24 50)"/>
+      <ellipse cx="8" cy="84" rx="10" ry="6" fill="#3fa34d" transform="rotate(-18 8 84)"/>
+    </svg>
+  </div>
+  <div class="vine" style="right:2vw; animation-delay:-2.4s;">
+    <svg width="34" height="120" viewBox="0 0 34 120">
+      <path d="M17,0 C26,24 8,42 19,68 C27,88 10,100 20,120" stroke="#2f7a3e" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="24" cy="22" rx="10" ry="6" fill="#3fa34d" transform="rotate(22 24 22)"/>
+      <ellipse cx="10" cy="50" rx="10" ry="6" fill="#3fa34d" transform="rotate(-20 10 50)"/>
+      <ellipse cx="26" cy="84" rx="10" ry="6" fill="#3fa34d" transform="rotate(18 26 84)"/>
+    </svg>
+  </div>
+
+  <div id="scorebar">
+    <div class="title">🥕 Garden <span>Spotter 1</span></div>
+    <div id="score-box">
+      <span id="stars-row">⭐</span>
+      Score: <strong id="score-val">0</strong>
+    </div>
+  </div>
+
+  <div id="stage">
+    <div id="question-card">
+      <div id="question-text"></div>
+      <div id="hint-label">Tap the picture that matches!</div>
+    </div>
+    <div id="item-field">
+      <!-- animal cards injected by JS -->
+    </div>
+  </div>
+
+  <div id="result-overlay">
+    <div id="result-badge">
+      <span id="result-emoji">🎉</span>
+      <div id="result-msg">Great!</div>
+    </div>
+  </div>
+
+  <script src="items.js"></script>
+  <script src="/shared/spotterEngine.js"></script>
+
+  <!-- ══════════ wall fingertip cursor ══════════ -->
+  <div id="wallCursor" class="wall-cursor" hidden>
+    <svg viewBox="0 0 60 60" width="60" height="60">
+      <circle id="wallCursorRing" cx="30" cy="30" r="24" fill="none" stroke="#ff69b4" stroke-width="4"
+              stroke-dasharray="151" stroke-dashoffset="151" transform="rotate(-90 30 30)" />
+      <circle cx="30" cy="30" r="6" fill="#ff69b4" />
+    </svg>
+  </div>
+
+  <!-- ══════════ wall camera / calibration boot overlay ══════════ -->
+  <canvas id="calStage" class="cal-stage"></canvas>
+  <div id="wallOverlay" class="wall-overlay">
+    <div class="wall-overlay-card">
+      <h1>Garden Spotter 1 🥕<span>Touch-Wall Edition</span></h1>
+      <p>
+        Point your index finger at the picture that matches the question,
+        and hold it there for a moment to pick it. Uses your webcam and
+        on-device hand tracking — nothing is uploaded anywhere.
+      </p>
+      <ul class="wall-steps">
+        <li>Allow camera access when prompted.</li>
+        <li>Hold your fingertip still over each of the 9 dots for 2 seconds to calibrate (skipped automatically if you've already calibrated another app on this wall).</li>
+        <li>Point at, and hold over, the picture that matches the question.</li>
+        <li>Press <kbd>R</kbd> any time to recalibrate.</li>
+      </ul>
+      <button id="wallStartBtn">Start camera &amp; begin</button>
+      <p id="wallStatus" class="wall-status"></p>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+  <script type="module" src="../../shared/bgMusic.js"></script>
+</body>
+</html>

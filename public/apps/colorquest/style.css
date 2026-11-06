@@ -1,0 +1,132 @@
+:root {
+  --ink: #2b2b38;
+  --muted: #7a7a94;
+  --accent: #7c3cdc;
+  --accent-2: #ff69b4;
+  --bg: #f4f3f8;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow: hidden;
+}
+
+.page {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Color Quest's p5 canvas fills the window (touch-wall style) */
+#canvasHolder {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+#canvasHolder canvas {
+  display: block;
+}
+
+/* Calibration overlay sits above the game, below the start-screen card */
+#calStage {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: none;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 16, 32, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  /* Only the card should catch clicks — if camera/model init ever fails
+     and this overlay is stuck visible, the dimmed background must NOT
+     swallow clicks meant for the game underneath. */
+  pointer-events: none;
+}
+
+.overlay-card {
+  pointer-events: auto; /* re-enable clicks for the card itself */
+  background: #fff;
+  border-radius: 16px;
+  padding: 36px 40px;
+  max-width: 480px;
+  width: calc(100% - 48px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.overlay-card h1 {
+  margin: 0 0 6px;
+  font-size: 26px;
+  color: var(--ink);
+}
+
+.overlay-card h1 span {
+  display: block;
+  font-size: 14px;
+  font-weight: normal;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-top: 4px;
+}
+
+.overlay-card p {
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.steps {
+  margin: 16px 0 24px;
+  padding-left: 20px;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.steps kbd {
+  background: #eee;
+  border-radius: 4px;
+  padding: 1px 6px;
+  border: 1px solid #ccc;
+  font-family: monospace;
+}
+
+#startBtn {
+  width: 100%;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+#startBtn:hover { transform: translateY(-1px); }
+#startBtn:disabled { opacity: 0.7; cursor: default; transform: none; }
+
+.status {
+  margin-top: 14px;
+  min-height: 18px;
+  font-size: 13px;
+  color: var(--accent);
+  text-align: center;
+}

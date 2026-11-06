@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Magic Number Tracing | Learn Numbers with Hand Gestures</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Comic Neue', 'Comic Sans MS', 'Chalkboard SE', cursive;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        #app {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.95);
+            padding: 12px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 10;
+            pointer-events: none;
+            backdrop-filter: blur(5px);
+            border: 2px solid #ffd966;
+        }
+        
+        .info-panel h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #4a5568;
+        }
+        
+        .info-panel p {
+            margin: 5px 0 0;
+            font-size: 0.8rem;
+            color: #718096;
+        }
+        
+        .number-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 15rem;
+            font-weight: bold;
+            color: rgba(255,255,255,0.15);
+            z-index: 1;
+            pointer-events: none;
+            font-family: 'Comic Sans MS', cursive;
+            text-shadow: 4px 4px 20px rgba(0,0,0,0.2);
+            white-space: pre;
+        }
+        
+        .progress-bar {
+            position: absolute;
+            bottom: 120px;
+            left: 10%;
+            right: 10%;
+            height: 12px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 20px;
+            overflow: hidden;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ade80, #22c55e);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 20px;
+            box-shadow: 0 0 10px rgba(74,222,128,0.5);
+        }
+        
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            z-index: 20;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: rgba(255,255,255,0.95);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            font-family: inherit;
+            color: #4a5568;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .next-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .reset-btn {
+            background: #f97316;
+            color: white;
+        }
+        
+        .number-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            padding: 12px;
+            border-radius: 20px;
+            z-index: 10;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            max-width: 300px;
+            justify-content: flex-end;
+        }
+        
+        .number-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            min-width: 40px;
+        }
+        
+        .number-btn.active {
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            color: white;
+            box-shadow: 0 0 15px rgba(74,222,128,0.5);
+        }
+        
+        .feedback {
+            position: absolute;
+            bottom: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: #4ade80;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            z-index: 10;
+            pointer-events: none;
+            white-space: nowrap;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        
+        .score {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            padding: 8px 20px;
+            border-radius: 50px;
+            color: gold;
+            font-weight: bold;
+            font-size: 1rem;
+            z-index: 10;
+            pointer-events: none;
+            backdrop-filter: blur(5px);
+        }
+        
+        .gesture-guide {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 15px;
+            border-radius: 15px;
+            color: white;
+            font-size: 0.7rem;
+            z-index: 10;
+            backdrop-filter: blur(5px);
+            pointer-events: none;
+            text-align: right;
+        }
+        
+        .status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: #4ade80;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            z-index: 10;
+            pointer-events: none;
+            backdrop-filter: blur(5px);
+        }
+        
+        @media (max-width: 768px) {
+            .number-display { font-size: 8rem; }
+            .number-selector { max-width: 200px; }
+            .number-btn { padding: 6px 10px; font-size: 0.8rem; }
+            button { padding: 8px 16px; font-size: 0.9rem; }
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: none;
+        }
+        
+        .celebration {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: gold;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+            z-index: 100;
+            pointer-events: none;
+            animation: celebrate 1s ease-out forwards;
+            white-space: nowrap;
+        }
+        
+        @keyframes celebrate {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+        }
+    </style>
+      <script language="javascript" type="text/javascript" src="libraries/p5.js"></script>
+     <script language="javascript" type="text/javascript" src="libraries/ml5.min.js"></script>
+     <script language="javascript" type="text/javascript" src="libraries/p5.sound.min.js"></script>
+     
+</head>
+<body>
+    <div id="app">
+        <div class="info-panel">
+            <h1>✍️ Magic Number Tracing ✨</h1>
+            <p>Trace numbers in the air with your finger!</p>
+        </div>
+        
+        <div class="status" id="status">🖐️ Loading Hand Tracking...</div>
+        
+        <div class="number-display" id="numberDisplay">0</div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="score" id="score">⭐ Score: 0</div>
+        
+        <div class="feedback" id="feedback">✨ Trace the number with your finger! ✨</div>
+        
+        <div class="gesture-guide">
+            <div>✋ Open Hand = Start Tracing</div>
+            <div>☝️ Point Finger = Trace Path</div>
+            <div>👆 Keep finger inside the number!</div>
+        </div>
+        
+        <div class="controls">
+            <button class="reset-btn" id="resetBtn">🔄 Reset Tracing</button>
+            <button class="next-btn" id="nextBtn">🎉 Next Number →</button>
+        </div>
+        
+        <div class="number-selector" id="numberSelector"></div>
+    </div>
+    
+    <script src="NumberTracing_AI.js"></script>
+  <script type="module" src="../../shared/bgMusic.js"></script>
+</body>
+</html>

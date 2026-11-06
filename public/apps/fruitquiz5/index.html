@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Fruit &amp; Veggie Quiz — Set 5 — Show What You Know!</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="wall.css" />
+</head>
+<body>
+
+<div id="ui-overlay">
+
+  <header class="top-bar">
+    <div class="brand">
+      <span class="brand-leaf">🍎</span>
+      <span class="brand-text">Fruit &amp; Veggie Quiz · Set 5</span>
+    </div>
+    <div class="hud">
+      <div class="pill" id="progressPill">Question 1 / 10</div>
+      <div class="pill pill-score" id="scorePill">⭐ 0</div>
+    </div>
+  </header>
+
+  <div class="stage">
+
+    <!-- START SCREEN -->
+    <section id="startScreen" class="panel start-panel" hidden>
+      <div class="start-emoji">🍎🥕🍌🍇</div>
+      <h1>Ready for the Fruit &amp; Veggie Quiz?</h1>
+      <p>Look, listen and spell your way through 10 tasty questions!</p>
+      <button id="startBtn" class="big-btn">Let's Go!</button>
+    </section>
+
+    <!-- QUIZ SCREEN -->
+    <section id="quizScreen" class="panel quiz-panel" hidden>
+      <div class="prompt-area" id="promptArea"></div>
+      <div class="answer-area" id="answerArea"></div>
+      <div class="feedback-banner" id="feedbackBanner"></div>
+    </section>
+
+    <!-- RESULT SCREEN -->
+    <section id="resultScreen" class="panel result-panel" hidden>
+      <div class="result-emoji" id="resultEmoji">🏆</div>
+      <h1 id="resultTitle">Great job!</h1>
+      <p id="resultScoreText">You scored 0 out of 10</p>
+      <div class="stars" id="resultStars"></div>
+      <button id="playAgainBtn" class="big-btn">Play Again</button>
+    </section>
+
+  </div>
+
+  <footer class="controls">
+    <button id="hintBtn" class="side-btn" hidden>
+      <span>🔊</span><span class="side-label">Hear it</span>
+    </button>
+    <button id="checkBtn" class="primary-btn" hidden disabled>Check</button>
+    <button id="nextBtn" class="primary-btn" hidden>Next ➜</button>
+  </footer>
+
+</div>
+
+<!-- ══════════ wall fingertip cursor (shown once camera/calibration boot completes) ══════════ -->
+<div id="wallCursor" class="wall-cursor" hidden>
+  <svg viewBox="0 0 60 60" width="60" height="60">
+    <circle id="wallCursorRing" cx="30" cy="30" r="24" fill="none" stroke="#ff69b4" stroke-width="4"
+            stroke-dasharray="151" stroke-dashoffset="151" transform="rotate(-90 30 30)" />
+    <circle cx="30" cy="30" r="6" fill="#ff69b4" />
+  </svg>
+</div>
+
+<!-- ══════════ wall camera / calibration boot overlay ══════════ -->
+<canvas id="calStage" class="cal-stage"></canvas>
+<div id="wallOverlay" class="wall-overlay">
+  <div class="wall-overlay-card">
+    <h1>Fruit &amp; Veggie Quiz — Set 5<span>Touch-Wall Edition</span></h1>
+    <p>
+      Point your index finger at an answer and hold it there for a moment
+      to pick it — same as tapping. Uses your webcam and on-device hand
+      tracking — nothing is uploaded anywhere.
+    </p>
+    <ul class="wall-steps">
+      <li>Allow camera access when prompted.</li>
+      <li>Hold your fingertip still over each of the 9 dots for 2 seconds to calibrate (skipped automatically if you've already calibrated another app on this wall).</li>
+      <li>Point at, and hold over, an answer, a letter tile, or a button to select it.</li>
+      <li>Press <kbd>R</kbd> any time to recalibrate.</li>
+    </ul>
+    <button id="wallStartBtn">Start camera &amp; begin</button>
+    <p id="wallStatus" class="wall-status"></p>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<script src="data.js"></script>
+<script src="FruitAssignment_5.js"></script>
+<script type="module" src="js/main.js"></script>
+  <script type="module" src="../../shared/bgMusic.js"></script>
+</body>
+</html>

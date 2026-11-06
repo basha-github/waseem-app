@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ABC Chart – Mouse Click</title>
+  <script src="libraries/p5.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #ffffff;
+      --divider: #e6e6e6;
+    }
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.35), rgba(255,255,255,0.35)),
+        url('../../shared/backgrounds/playroom.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+    canvas { display: block; position: fixed; top: 0; left: 0; z-index: 5; }
+
+    /* ── ABC Chart DOM layer ── */
+    #abc-ui {
+      display: none;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 10;
+      pointer-events: none;
+    }
+    #abc-ui.visible { display: block; }
+
+    #divider {
+      position: absolute;
+      top: 0; bottom: 0; left: 62%;
+      width: 3px;
+      background: var(--divider);
+      z-index: 3;
+    }
+
+    /* ── Left grid — fits ALL 26 letters, no scrolling ── */
+    #chart-panel {
+      position: absolute;
+      top: 0; left: 0;
+      width: 62%; height: 100%;
+      overflow: hidden;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(2px);
+    }
+
+    /* ── Stacked layout (narrow/mobile screens): chart grid on top,
+       letter-display panel below, instead of side-by-side. The p5
+       canvas itself switches to the matching geometry in JS
+       (see STACK_BREAKPOINT / _displayRect() in the .js file). ── */
+    #abc-ui.stacked #divider {
+      left: 0; right: 0; top: 56%; bottom: auto;
+      width: 100%; height: 3px;
+    }
+    #abc-ui.stacked #chart-panel {
+      width: 100%; height: 56%;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: repeat(5, 1fr);
+      gap: 7px;
+      width: 100%;
+      height: 100%;
+      pointer-events: all;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 6px 4px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      border: 2.5px solid #ececec;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      user-select: none;
+      position: relative;
+      overflow: hidden;
+      min-width: 0; min-height: 0;
+      cursor: pointer;
+      pointer-events: all;
+    }
+    .card:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 22px rgba(0,0,0,0.18);
+      border-color: currentColor !important;
+    }
+    .card:active {
+      transform: scale(0.97);
+    }
+    .card.active {
+      border-color: currentColor;
+      transform: scale(0.97);
+    }
+    .card .emoji  { font-size: clamp(28px, 7vh, 60px); line-height: 1; }
+    .card img.emoji { width: clamp(40px, 9.5vh, 88px); height: auto; display: block; -webkit-user-drag: none; user-select: none; }
+    .card .letter { font-family: 'Fredoka One', cursive; font-size: clamp(18px, 4.2vh, 36px); line-height: 1; }
+    .card .word   {
+      font-family: 'Nunito', sans-serif; font-size: clamp(9px, 1.7vh, 14px); font-weight: 700;
+      letter-spacing: 0.02em; text-transform: uppercase; opacity: 0.7;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+    }
+
+    /* Colourful letters on white cards */
+    .card:nth-child(7n+1) { color:#e8333a; }
+    .card:nth-child(7n+2) { color:#e87d17; }
+    .card:nth-child(7n+3) { color:#c9a800; }
+    .card:nth-child(7n+4) { color:#2e9e4f; }
+    .card:nth-child(7n+5) { color:#1c7ed6; }
+    .card:nth-child(7n+6) { color:#7048e8; }
+    .card:nth-child(7n+7) { color:#d6367d; }
+  </style>
+</head>
+<body>
+
+  <!-- ABC Chart DOM -->
+  <div id="abc-ui">
+    <div id="divider"></div>
+    <div id="chart-panel">
+      <div class="grid" id="grid"></div>
+    </div>
+  </div>
+
+  <!-- ABC Chart app — p5 global mode, mouse-click driven -->
+  <script src="WallAlphabetChart.js"></script>
+  <script type="module" src="../../shared/bgMusic.js"></script>
+  <script type="module" src="js/wallFingerPointing.js"></script>
+
+</body>
+</html>

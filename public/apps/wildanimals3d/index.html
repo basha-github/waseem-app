@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Wild Animals 3D — Point &amp; Play</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0; height: 100%; overflow: hidden; touch-action: manipulation;
+      background-image:
+        linear-gradient(rgba(0,0,0,0.12), rgba(0,0,0,0.12)),
+        url('../../shared/backgrounds/forest.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    canvas { display: block; }
+    /* three.js canvas overlays the p5 canvas */
+    #three-canvas { position: fixed; inset: 0; pointer-events: none; }
+  </style>
+
+  <!-- p5.js (global mode) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+
+  <!-- three.js (non-module builds so everything is global, like p5) -->
+  <!-- r147 is the last release with global (non-module) builds -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.147.0/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+<body>
+  <!-- animal model + scene management -->
+  <script src="js/AnimalModel.js"></script>
+  <script src="js/AnimalSceneManager.js"></script>
+  <script src="js/sketch.js"></script>
+
+  <!-- Previous / Next / Next Animal / 360 controls + finger-pointing support -->
+  <script src="js/controls.js"></script>
+  <script type="module" src="../../shared/bgMusic.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Garden Languages 2 🍎</title>
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="wall.css" />
+</head>
+<body>
+  <div class="page">
+    <div class="stageWrap" id="stageWrap">
+      <canvas id="stage"></canvas>
+      <div id="imgLayer"></div>
+    </div>
+  </div>
+
+  <!-- ══════════ wall camera / calibration boot overlay ══════════ -->
+  <canvas id="calStage" class="cal-stage"></canvas>
+  <div id="wallOverlay" class="wall-overlay">
+    <div class="wall-overlay-card">
+      <h1>Garden Languages 2 🍎<span>Touch-Wall Edition</span></h1>
+      <p>
+        Point at, or click/tap, a language circle to hear this item's name
+        spoken in English, Hindi, or Telugu. Uses your webcam and
+        on-device hand tracking — nothing is uploaded anywhere.
+      </p>
+      <ul class="wall-steps">
+        <li>Allow camera access when prompted.</li>
+        <li>Hold your fingertip still over each of the 9 dots for 2 seconds to calibrate (skipped automatically if you've already calibrated another app on this wall).</li>
+        <li>Point at (or click/tap) a language circle to hear it.</li>
+        <li>Hold over — or click/tap — Next/Prev to change items.</li>
+        <li>Press <kbd>R</kbd> any time to recalibrate.</li>
+      </ul>
+      <button id="wallStartBtn">Start camera &amp; begin</button>
+      <p id="wallStatus" class="wall-status"></p>
+    </div>
+  </div>
+
+  <script src="items.js"></script>
+  <script type="module" src="js/main.js"></script>
+  <script type="module" src="../../shared/bgMusic.js"></script>
+</body>
+</html>
