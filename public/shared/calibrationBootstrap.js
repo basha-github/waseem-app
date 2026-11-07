@@ -38,7 +38,8 @@ const CAL_DWELL_MS = 2000;
 const CAL_STILL_CAM = 40;     // px the pen may wobble (camera px) and still count as "holding still"
 const CAL_RELEASE_CAM = 20;   // px the pen must travel from the last capture... unless it was lifted
 const CAL_DROP_MS = 600;      // a dropout shorter than this does NOT restart the 2 s hold
-const CAL_LIFT_MS = 250;      // ...lifting the pen off the wall this long also releases it
+const CAL_LIFT_MS = 250;
+const CAL_GLITCH_MS = 400;    // a jump away from the dot shorter than this is a glitch (reflection/flicker), not a move      // ...lifting the pen off the wall this long also releases it
 
 // "wallSharedCalibration" in hand mode, "wallSharedCalibrationIR" in IR-pen mode
 // (see shared/inputConfig.js) — a calibration only fits the device it was captured with.
@@ -236,19 +237,34 @@ class Calibrator {
     }
     if (this.calDwellStart === 0) {
       this.calAnchorX = fx; this.calAnchorY = fy;
+      this.calSumX = fx; this.calSumY = fy; this.calSumN = 1;
+      this.calAwaySince = 0;
       this.calDwellStart = now(); this.calDwellProg = 0;
       return;
     }
     if (dist(fx, fy, this.calAnchorX, this.calAnchorY) <= CAL_STILL_CAM) {
+      this.calAwaySince = 0;
+      // average every steady reading; the anchor follows the average so slow drift is fine
+      this.calSumX += fx; this.calSumY += fy; this.calSumN += 1;
+      this.calAnchorX = this.calSumX / this.calSumN; this.calAnchorY = this.calSumY / this.calSumN;
       this.calDwellProg = clamp((now() - this.calDwellStart) / CAL_DWELL_MS, 0, 1);
       if (this.calDwellProg >= 1) {
-        this.calLastCapX = fx; this.calLastCapY = fy;
-        this.recordPoint();
+        this.calLastCapX = this.calAnchorX; this.calLastCapY = this.calAnchorY;
+        this.recordPoint(this.calAnchorX, this.calAnchorY);
       }
     } else {
+      // A short jump (reflection, flicker, the camera seeing something else for a few
+      // frames) does not restart the hold; only a jump that lasts CAL_GLITCH_MS does.
+      if (!this.calAwaySince) this.calAwaySince = now();
+      if (now() - this.calAwaySince < CAL_GLITCH_MS) {
+        this.calWhy = "glitch ignored " + Math.round(dist(fx, fy, this.calAnchorX, this.calAnchorY)) + "px";
+        return;
+      }
+      this.calAwaySince = 0;
       this.dbgCount.moved++;
       this.calWhy = "pen jumped " + Math.round(dist(fx, fy, this.calAnchorX, this.calAnchorY)) + "px";
       this.calAnchorX = fx; this.calAnchorY = fy;
+      this.calSumX = fx; this.calSumY = fy; this.calSumN = 1;
       this.calDwellStart = now(); this.calDwellProg = 0;
     }
   }
@@ -273,11 +289,12 @@ class Calibrator {
     this.calLastCapX = -1; this.calLastCapY = -1;
   }
 
-  recordPoint() {
+  recordPoint(avgX, avgY) {
     if (this.hand.finger_x < 0 || this.hand.finger_y < 0) return; // nothing detected — never record a fake point
     const dot = this.calGrid[this.activeIdx];
-    const fx = this.hand.finger_x;
-    const fy = this.hand.finger_y;
+    // auto-capture passes the average of the 2 s hold; a manual capture (Space/click) uses the live reading
+    const fx = avgX !== undefined ? avgX : this.hand.finger_x;
+    const fy = avgY !== undefined ? avgY : this.hand.finger_y;
     this.pairs.push({ proj: [dot.x, dot.y], cam: [fx, fy] });
     this.dotStatus[this.activeIdx] = "confirmed";
     this.flashRings.push({ x: dot.x, y: dot.y, r: DOT_R, alpha: 255 });
@@ -310,7 +327,7 @@ class Calibrator {
       alphaRing(ctx, `rgba(255,80,140,${(100 + p2 * 120) / 255})`, x, y, DOT_R + 5 + p2 * 6, 2);
       ctx.save();
       ctx.beginPath(); ctx.arc(x, y, DOT_R, 0, Math.PI * 2);
-      ctx.fillStyle = "rgb(255,80,140)"; ctx.fill();
+      ctx.fillStyle = this.isPen ? "rgb(150,45,85)" : "rgb(255,80,140)"; ctx.fill();
       ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2);
       ctx.fillStyle = "#fff"; ctx.fill();
       ctx.restore();
@@ -345,7 +362,8 @@ class Calibrator {
   draw() {
     const ctx = this.ctx;
     ctx.clearRect(0, 0, this.width, this.height);
-    ctx.fillStyle = "#fff";
+    // IR pen: a BLACK screen, so the camera sees as little projected light as possible
+    ctx.fillStyle = this.isPen ? "#000" : "#fff";
     ctx.fillRect(0, 0, this.width, this.height);
     this.pulse += 0.06;
 
@@ -372,7 +390,7 @@ class Calibrator {
       }
 
       const fx = this.hand.finger_x, fy = this.hand.finger_y;
-      if (fx >= 0) {
+      if (fx >= 0 && !this.isPen) {
         const sx = fx * (this.width / CAM_W);
         const sy = fy * (this.height / CAM_H);
         ctx.save();
@@ -409,7 +427,7 @@ class Calibrator {
       const dl = this.calLastCapX >= 0 && fx >= 0 ? Math.round(dist(fx, fy, this.calLastCapX, this.calLastCapY)) : "-";
       text(ctx,
         `pen cam x:${fx >= 0 ? Math.round(fx) : "-"} y:${fy >= 0 ? Math.round(fy) : "-"}   moved from last dot: ${dl}px (or lift the pen; need >${CAL_RELEASE_CAM})   hold restarts: lost ${this.dbgCount.lost} / jumped ${this.dbgCount.moved} (last: ${this.calWhy})   |   Space = capture now · N = skip dot · B = back`,
-        this.width / 2, this.height - 18, "12px Arial", "rgb(120,120,140)");
+        this.width / 2, this.height - 18, "14px Arial", "rgb(150,150,170)");
     } else {
       const ok = this.calH !== null;
       text(ctx, ok ? "Calibration complete — starting…" : "Calibration failed — retrying…",
