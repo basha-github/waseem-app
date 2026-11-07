@@ -64,7 +64,7 @@ function isMobileDevice() {
 
 export function saveCalibration(H, pairs) {
   try {
-    localStorage.setItem(CAL_STORAGE_KEY, JSON.stringify({ homography: H, pairs }));
+    localStorage.setItem(CAL_STORAGE_KEY, JSON.stringify({ homography: H, pairs, screen: true })); // screen: 0-1 of the whole window
   } catch (e) {
     console.warn("[warn] could not save calibration:", e);
   }
@@ -422,6 +422,30 @@ class Calibrator {
     this.draw();
     if (!this.calDone || this.calH === null) requestAnimationFrame(() => this.loop());
   }
+}
+
+/**
+ * Full-screen, app-independent calibration (used by /calibrate/).
+ * Starts the tracker, runs the 9-dot calibration on `canvas` (which must
+ * fill the whole window), saves it, releases the camera and resolves.
+ * Calibration is stored as 0-1 of the WHOLE window, so every app maps it
+ * onto its own canvas position.
+ *
+ * @param {Object} opts
+ * @param {HTMLCanvasElement} opts.canvas
+ * @param {HTMLElement} [opts.statusEl]
+ * @param {(hand: object) => void} [opts.onTracker]  called once the camera is running
+ * @returns {Promise<number[][]>} the homography
+ */
+export async function runCalibrationScreen({ canvas, statusEl, onTracker }) {
+  const hand = await createTracker({ camW: CAM_W, camH: CAM_H, maxHands: 1 });
+  await hand.init(msg => { if (statusEl) statusEl.textContent = msg; });
+  if (onTracker) onTracker(hand);
+  const H = await new Promise(resolve => {
+    new Calibrator(canvas, statusEl, hand, resolve).start();
+  });
+  try { hand.release(); } catch (e) { /* ignore */ }
+  return H;
 }
 
 /**

@@ -7,9 +7,12 @@ calibration, homography, dwell-click, all apps) is unchanged — the IR tracker
 ## First run
 1. Open the wall, allow the camera. If a camera is named "IR"/"infrared" it is picked automatically;
    otherwise press **Shift+C** to cycle cameras (the page reloads on the one you want).
-2. Calibrate as before: touch the pen to each pulsing dot and hold it still for 2 s.
+2. Calibration runs **once, full screen, before any app opens** (page `/calibrate/`, started by the launcher).
+   Touch the pen to each pulsing dot and hold it still for 2 s. If the pen is not seen for 3 s,
+   the live camera view opens by itself (bottom-left) so you can see what the camera sees.
    IR mode keeps its **own** calibration (`wallSharedCalibrationIR`), so the old finger calibration is untouched.
-3. Press **R** any time to recalibrate.
+3. To recalibrate: **⌂ → 🎯 Calibrate the wall**, or press **R** inside any app (the launcher then opens
+   the full-screen calibration instead of calibrating inside the app).
 
 ## Tuning keys (remembered, shared by every app)
 | Keys | What it does |

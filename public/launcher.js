@@ -199,17 +199,57 @@
 
     let lastTs = 0;
     let currentApp = "menu";
+    let calibrating = false;
+
+    // ── one full-screen calibration, outside every app ──────────────────
+    // Same key logic as shared/inputConfig.js calStorageKey().
+    function calKey() {
+      const p = (new URLSearchParams(location.search).get("input") || "").toLowerCase();
+      let m = p === "hand" || p === "irpen" ? p : localStorage.getItem("wallInputMode");
+      return m === "hand" ? "wallSharedCalibration" : "wallSharedCalibrationIR";
+    }
+    function isCalibrated() {
+      try {
+        const d = JSON.parse(localStorage.getItem(calKey()) || "null");
+        return !!(d && d.homography && d.screen); // older in-app calibrations are redone once
+      } catch (e) { return false; }
+    }
+    function startCalibration() {
+      calibrating = true;
+      overlay.classList.add("hidden");
+      frame.src = "/calibrate/index.html";
+      frame.addEventListener("load", () => frame.focus(), { once: true });
+    }
+    window.addEventListener("message", e => {
+      if (e.origin !== location.origin || !e.data || e.data.type !== "wall-calibrated") return;
+      calibrating = false;
+      showApp(currentApp);
+    });
+    // An app cleared the calibration (R key) → recalibrate here, full screen.
+    window.addEventListener("storage", e => {
+      if (e.key === calKey() && !e.newValue && !calibrating) startCalibration();
+    });
 
     function showApp(id) {
       currentApp = id;
       if (id === "menu" || !APPS_BY_ID[id]) {
+        if (calibrating) return;
         frame.removeAttribute("src");
         overlay.classList.remove("hidden");
+      } else if (!isCalibrated()) {
+        if (!calibrating) startCalibration(); // opens the app afterwards
       } else {
+        calibrating = false;
         frame.src = APPS_BY_ID[id].path;
         overlay.classList.add("hidden");
+        frame.addEventListener("load", () => frame.focus(), { once: true });
       }
     }
+
+    document.getElementById("calibrateBtn").addEventListener("click", () => {
+      try { localStorage.removeItem(calKey()); } catch (e) { /* ignore */ }
+      startCalibration();
+    });
 
     renderCategorizedGrid(gridHost, APPS, async id => {
       showApp(id);
@@ -224,7 +264,8 @@
     getState().then(s => {
       lastTs = s.ts || 0;
       showApp(s.app || "menu");
-    }).catch(() => showApp("menu"));
+      if (!isCalibrated() && !calibrating) startCalibration();
+    }).catch(() => { showApp("menu"); if (!isCalibrated() && !calibrating) startCalibration(); });
 
     setInterval(async () => {
       try {

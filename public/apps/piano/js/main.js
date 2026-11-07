@@ -237,8 +237,17 @@ class App {
   mapPoint(camPt) {
     if (!this.calH) return null;
     const n = applyHomography(this.calH, camPt);
-    if (!n) return null;
-    return [n[0] * this.width, n[1] * this.height];
+    if (!n) return [-99999, -99999]; // unmappable point → off-screen (never crash the draw loop)
+    // Calibration is stored as 0-1 of the WHOLE window (see /calibrate/);
+    // shift it onto this canvas, which sits inside the page layout.
+    const r = this.canvas.getBoundingClientRect();
+    return [n[0] * window.innerWidth - r.left, n[1] * window.innerHeight - r.top];
+  }
+
+  // canvas px -> 0-1 of the whole window (how calibrations are stored)
+  toWindowNorm([x, y]) {
+    const r = this.canvas.getBoundingClientRect();
+    return [(x + r.left) / window.innerWidth, (y + r.top) / window.innerHeight];
   }
 
   buildGrid() {
@@ -334,7 +343,7 @@ class App {
       return;
     }
     this.calH = computeHomography(
-      this.pairs.map(p => ({ cam: p.cam, proj: [p.proj[0] / this.width, p.proj[1] / this.height] }))
+      this.pairs.map(p => ({ cam: p.cam, proj: this.toWindowNorm(p.proj) }))
     );
     if (this.calH) {
       saveCalibration(this.calH, this.pairs);
