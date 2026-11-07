@@ -452,6 +452,8 @@ async function initWallFingerPointing() {
               if (progress >= 1) {
                 const clicked = hoverEl;
                 clearHover();
+                // one click per visit: stay on this element without re-clicking until the pen leaves it
+                hoverEl = clicked; hoverStart = Infinity;
                 clicked.click();
               }
             }

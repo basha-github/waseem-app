@@ -118,6 +118,8 @@ runWallBootstrap({
           const clicked = hoverBtn;
           clearBtnHover();
           setRingProgress(0);
+          // one click per visit: stay on this button without re-clicking until the pen leaves it
+          hoverBtn = clicked; hoverStart = Infinity;
           clicked.click();
         }
       } else {

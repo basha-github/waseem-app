@@ -246,6 +246,17 @@
       }
     }
 
+    // Many apps have a "⌂ back to hub" link (href="/"). Inside the wall that would load a
+    // second launcher inside the frame — open the menu instead.
+    frame.addEventListener("load", () => {
+      let p = "";
+      try { p = frame.contentWindow.location.pathname; } catch (e) { return; }
+      if (p === "/" || p === "/index.html") {
+        frame.removeAttribute("src");
+        overlay.classList.remove("hidden");
+      }
+    });
+
     document.getElementById("calibrateBtn").addEventListener("click", () => {
       try { localStorage.removeItem(calKey()); } catch (e) { /* ignore */ }
       startCalibration();

@@ -21,6 +21,7 @@
 //  so it can be unit-tested in Node.
 // ═══════════════════════════════════════════════════════════════
 import { getIrSettings, saveIrSettings } from "./inputConfig.js";
+import { penDomClickerUpdate } from "./penDomClicker.js";
 
 const SMOOTH_N = 2;        // average over the last N frames (same as the hand tracker)
 const GRACE_FRAMES = 6;    // hold position through brief dropouts
@@ -227,6 +228,9 @@ export class IRPenTracker {
     }
 
     if (this._dbg) this._drawDebug();
+
+    // Pen-dwell clicking for ordinary page buttons/links/cards, in every app.
+    try { penDomClickerUpdate(this.finger_x, this.finger_y); } catch (e) { /* never break tracking */ }
   }
 
   // Keep each pen in its own slot across frames; new blobs fill free slots.

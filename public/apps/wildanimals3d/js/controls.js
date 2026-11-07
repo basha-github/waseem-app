@@ -20,6 +20,7 @@ function waitForAnimals(cb) {
 function buildButtons() {
   const wrap = document.createElement("div");
   wrap.className = "walk-btns";
+  wrap.dataset.penOwn = "1"; // these buttons have their own pen dwell (see pump below)
   wrap.innerHTML = `
     <div class="species-label" id="speciesLabel">🐘 Elephant</div>
 
