@@ -183,9 +183,8 @@ class App {
     this.calLostSince = 0;
     this.autoStartAt = 0;
 
-    this.posterScale = 1;
-    this.padX = 0;
-    this.padY = 0;
+    // (was reset to 1 here, AFTER resize() had computed it — the poster never scaled to the screen)
+    this.layoutPoster();
 
     this.appMode = "loading";
     this.hand = new HandTracker({ camW: CAM_W, camH: CAM_H });
@@ -221,10 +220,10 @@ class App {
   }
 
   resize() {
-    const cssW = window.innerWidth * 0.8;
-    const cssH = window.innerHeight * 0.8;
-    this.width = Math.max(900, Math.floor(cssW));
-    this.height = Math.max(600, Math.floor(cssH));
+    // Fill the whole wall: the poster is scaled to fit (layoutPoster), so
+    // every instrument stays visible and as big as the screen allows.
+    this.width = Math.floor(window.innerWidth);
+    this.height = Math.floor(window.innerHeight);
     this.canvas.style.width = this.width + "px";
     this.canvas.style.height = this.height + "px";
     this.canvas.width = Math.round(this.width * this.dpr);
