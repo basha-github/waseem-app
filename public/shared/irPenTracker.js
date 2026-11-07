@@ -24,7 +24,7 @@ import { getIrSettings, saveIrSettings } from "./inputConfig.js";
 import { penDomClickerUpdate } from "./penDomClicker.js";
 
 const SMOOTH_N = 2;        // average over the last N frames (same as the hand tracker)
-const GRACE_FRAMES = 6;    // hold position through brief dropouts
+const GRACE_FRAMES = 10;   // hold position through brief dropouts (~0.33 s at 30 fps)
 const MATCH_RADIUS = 160;  // px a pen may move between frames and stay "the same pen"
 
 // ── pure detection ──────────────────────────────────────────────
@@ -249,7 +249,10 @@ export class IRPenTracker {
       if (best >= 0) { out[s] = blobs[best]; used.add(best); }
     }
     for (let s = 0; s < this.maxPoints; s++) {
-      if (out[s]) continue;
+      // A pen that is only briefly missing keeps its slot: a bright spot far away
+      // (reflection, flicker) must not take over and make the pointer jump.
+      // A real move elsewhere is picked up once the grace period has run out.
+      if (out[s] || this._slots[s]) continue;
       const i = blobs.findIndex((_, k) => !used.has(k));
       if (i >= 0) { out[s] = blobs[i]; used.add(i); }
     }

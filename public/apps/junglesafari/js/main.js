@@ -42,7 +42,11 @@ function setRingProgress(p) {
 }
 
 function dispatchCanvasClick(x, y) {
-  const canvas = document.querySelector("canvas");
+  // The game's canvas under the pen — NOT simply the first <canvas> on the page,
+  // which is the hidden calibration canvas (#calStage) and swallowed every tap.
+  const under = document.elementsFromPoint ? document.elementsFromPoint(x, y) : [];
+  const canvas = under.find(n => n.tagName === "CANVAS" && n.id !== "calStage")
+    || document.querySelector("canvas:not(#calStage)");
   if (!canvas) return;
   const opts = { clientX: x, clientY: y, bubbles: true, cancelable: true, view: window, button: 0 };
   canvas.dispatchEvent(new MouseEvent("mousedown", opts));
@@ -66,6 +70,8 @@ runWallBootstrap({
     let canvasAnchor = null;   // {x,y} of where the current dwell started
     let canvasStart = 0;
     let lastTrigger = null;    // {x,y} of the last successful canvas tap (release-radius gate)
+    let lostSince = 0;         // when the pen was last lost (for lift / dropout handling)
+    const LIFT_MS = 300;       // pen gone longer than this = lifted off the wall
 
     function clearBtnHover() {
       if (hoverBtn) hoverBtn.classList.remove("wall-dwell-hover");
@@ -76,12 +82,24 @@ runWallBootstrap({
       hand.update();
 
       if (!(calH && hand.finger_x >= 0 && hand.finger_y >= 0)) {
-        cursorEl.style.visibility = "hidden";
-        clearBtnHover();
-        setRingProgress(0);
-        canvasAnchor = null;
+        // A short dropout keeps the current hold; only a real lift resets it.
+        if (!lostSince) lostSince = performance.now();
+        if (performance.now() - lostSince > LIFT_MS) {
+          cursorEl.style.visibility = "hidden";
+          clearBtnHover();
+          setRingProgress(0);
+          canvasAnchor = null;
+          lastTrigger = null; // lifting the pen re-arms a tap on the same spot
+        }
         requestAnimationFrame(pump);
         return;
+      }
+      if (lostSince) {
+        // pen is back after a short dropout: don't count the missing time
+        const gap = performance.now() - lostSince;
+        if (isFinite(hoverStart)) hoverStart += gap;
+        canvasStart += gap;
+        lostSince = 0;
       }
 
       const n = applyHomography(calH, [hand.finger_x, hand.finger_y]);
