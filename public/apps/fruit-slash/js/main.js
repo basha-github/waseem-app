@@ -240,12 +240,11 @@ class App {
   }
 
   resize() {
-    const cssW = window.innerWidth * 0.8;
-    // Same +200px off-screen buffer below the visible strip the original
-    // used, for smoother off-screen fruit falling before despawn.
-    const cssH = window.innerHeight * 0.8 + 200;
-    this.width = Math.max(900, Math.floor(cssW));
-    this.height = Math.max(600, Math.floor(cssH));
+    // Fill the whole wall, plus the original +200px buffer BELOW the bottom
+    // edge (the page is top-aligned and clips it) so fruit falls out of sight
+    // smoothly before despawning.
+    this.width = Math.floor(window.innerWidth);
+    this.height = Math.floor(window.innerHeight) + 200;
     this.canvas.style.width = this.width + "px";
     this.canvas.style.height = this.height + "px";
     this.canvas.width = Math.round(this.width * this.dpr);

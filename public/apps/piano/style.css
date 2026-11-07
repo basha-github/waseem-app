@@ -30,8 +30,6 @@ html, body {
 #stage {
   display: block;
   background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
   touch-action: none;
 }
 

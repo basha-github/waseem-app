@@ -219,10 +219,9 @@ class App {
   }
 
   resize() {
-    const cssW = window.innerWidth * 0.8;
-    const cssH = window.innerHeight * 0.8;
-    this.width = Math.max(900, cssW);
-    this.height = Math.max(560, cssH);
+    // Fill the whole wall (the layout below scales to this size).
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
     this.canvas.style.width = this.width + "px";
     this.canvas.style.height = this.height + "px";
     this.canvas.width = Math.round(this.width * this.dpr);
