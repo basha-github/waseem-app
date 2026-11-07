@@ -32,6 +32,51 @@ let blocked = null;          // element some other code clicked while we hovered
 let ringEl = null, ringArc = null;
 let listening = false;
 
+// ── "pen view" (Shift+P in any app): shows where the wall thinks the pen is ──
+const VIEW_KEY = "wallPenView";
+let viewOn = false, viewEl = null, viewDot = null, viewTxt = null, lastSeen = 0;
+try { viewOn = localStorage.getItem(VIEW_KEY) === "1"; } catch (e) { /* ignore */ }
+
+function ensureView() {
+  if (viewEl) return;
+  viewEl = document.createElement("div");
+  viewEl.style.cssText = "position:fixed;inset:0;z-index:2147483647;pointer-events:none;";
+  viewDot = document.createElement("div");
+  viewDot.style.cssText = "position:absolute;left:0;top:0;width:90px;height:90px;margin:-45px 0 0 -45px;display:none;" +
+    "background:linear-gradient(#ff2d8d,#ff2d8d) center/4px 100% no-repeat,linear-gradient(#ff2d8d,#ff2d8d) center/100% 4px no-repeat;" +
+    "border:3px solid #ff2d8d;border-radius:50%;box-shadow:0 0 0 3px rgba(255,255,255,.85);";
+  viewTxt = document.createElement("div");
+  viewTxt.style.cssText = "position:absolute;left:50%;top:10px;transform:translateX(-50%);padding:8px 16px;border-radius:10px;" +
+    "font:600 16px system-ui,sans-serif;color:#fff;background:rgba(20,22,50,.88);white-space:nowrap;";
+  viewEl.appendChild(viewDot); viewEl.appendChild(viewTxt);
+  (document.body || document.documentElement).appendChild(viewEl);
+}
+function updateView(x, y, seen) {
+  if (!viewOn) { if (viewEl) viewEl.style.display = "none"; return; }
+  ensureView();
+  viewEl.style.display = "block";
+  if (seen) {
+    lastSeen = performance.now();
+    viewDot.style.display = "block";
+    viewDot.style.transform = `translate(${x}px, ${y}px)`;
+    viewTxt.style.background = "rgba(20,110,70,.9)";
+    viewTxt.textContent = `PEN VIEW — pen seen ✔  (the pink cross should be exactly under the pen tip)   Shift+P = hide`;
+  } else {
+    viewDot.style.display = "none";
+    viewTxt.style.background = "rgba(170,40,40,.92)";
+    viewTxt.textContent = `PEN VIEW — camera does NOT see the pen here ✖   Shift+P = hide`;
+  }
+}
+function installViewKey() {
+  window.addEventListener("keydown", e => {
+    if (e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey && (e.key === "P" || e.key === "p")) {
+      viewOn = !viewOn;
+      try { localStorage.setItem(VIEW_KEY, viewOn ? "1" : "0"); } catch (err) { /* ignore */ }
+      updateView(0, 0, performance.now() - lastSeen < 300);
+    }
+  });
+}
+
 function loadCal() {
   let raw = null;
   try { raw = localStorage.getItem(calStorageKey()); } catch (e) { /* ignore */ }
@@ -122,6 +167,7 @@ function reset() { target = null; start = 0; awaySince = 0; hideRing(); }
 export function penDomClickerUpdate(camX, camY) {
   if (!listening) {
     listening = true;
+    installViewKey();
     // Someone else (the app's own bridge, a mouse) clicked what we're on → stand down for it.
     document.addEventListener("click", e => {
       if (target && e.target instanceof Node && (target === e.target || target.contains(e.target) || e.target.contains(target))) {
@@ -133,6 +179,7 @@ export function penDomClickerUpdate(camX, camY) {
   if (!document.body || !loadCal()) { reset(); return; }
 
   if (camX < 0 || camY < 0) {
+    updateView(0, 0, false);
     if (!lostSince) lostSince = t;
     if (t - lostSince > LOST_GRACE_MS) { reset(); blocked = null; }
     return;
@@ -143,6 +190,7 @@ export function penDomClickerUpdate(camX, camY) {
   const n = applyHomography(calH, [camX, camY]);
   if (!n) { reset(); return; }
   const x = n[0] * window.innerWidth, y = n[1] * window.innerHeight;
+  updateView(x, y, true);
   const el = clickableAt(x, y);
 
   if (blocked && el !== blocked) blocked = null; // pen left the element the app clicked
